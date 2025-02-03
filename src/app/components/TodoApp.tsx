@@ -5,15 +5,16 @@ import {
   FcMediumPriority,
   FcLowPriority,
 } from "react-icons/fc"; // Import the icons
+import { MdNotInterested } from "react-icons/md";
 
 const TodoApp = () => {
   return (
-    <div className="bg-dark">
+    <div className="bg-dark max-h-[100vh]">
       <TodoLists />
       <footer>
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded shadow-md">
           {/* Fixed position, centered */}
-          <p className="flex items-center justify-center">
+          <p className="flex items-center justify-center hover:underline">
             <label className="mr-4">Priorities: </label>
             {"   "}
             <span className="mr-4 flex items-center">
@@ -24,8 +25,11 @@ const TodoApp = () => {
             <span className="mr-4 flex items-center">
               <FcMediumPriority className="mr-2" /> Medium
             </span>
-            <span className="flex items-center">
+            <span className="mr-4 flex items-center">
               <FcLowPriority className="mr-2" /> Low
+            </span>
+            <span className="flex items-center">
+              <MdNotInterested className="mr-2" /> None
             </span>
           </p>
         </div>

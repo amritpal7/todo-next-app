@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Todo } from "../types";
 import { Input } from "./Input";
 import { FaEllipsisV, FaEdit, FaUndo } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdNotInterested } from "react-icons/md";
 import { IoMdDoneAll } from "react-icons/io";
 import {
   FcHighPriority,
@@ -30,19 +30,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [editText, setEditText] = useState(todo.text);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null); // Ref for the menu
+  const inputRef = useRef<HTMLInputElement>(null); // Ref for the input field
 
-  const getPriorityIcon = (priority: Todo["priority"]) => {
-    switch (priority) {
-      case "high":
-        return <FcHighPriority className="mr-2" />;
-      case "medium":
-        return <FcMediumPriority className="mr-2" />;
-      case "low":
-        return <FcLowPriority className="mr-2" />;
-      default:
-        return null; // Or return a default icon if needed
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus(); // Auto-focus input when editing
     }
-  };
+  }, [isEditing]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,27 +63,60 @@ const TodoItem: React.FC<TodoItemProps> = ({
     }
   };
 
-  const handlePriorityChange = (newPriority: Todo["priority"]) => {
-    onTodoPriority(todo.id, newPriority);
-    setShowMenu(false);
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleEditSave();
+    }
+  };
+
+  // Cycle between priority levels when clicking the priority icon
+  const cyclePriority = () => {
+    const priorityLevels: Todo["priority"][] = [
+      "none",
+      "low",
+      "medium",
+      "high",
+    ];
+    const currentIndex = priorityLevels.indexOf(todo.priority);
+    const nextPriority =
+      priorityLevels[(currentIndex + 1) % priorityLevels.length]; // Cycle to next priority
+    onTodoPriority(todo.id, nextPriority);
+  };
+
+  // Get priority icon based on current priority
+  const getPriorityIcon = () => {
+    switch (todo.priority) {
+      case "high":
+        return <FcHighPriority className="mr-2 cursor-pointer" />;
+      case "medium":
+        return <FcMediumPriority className="mr-2 cursor-pointer" />;
+      case "low":
+        return <FcLowPriority className="mr-2 cursor-pointer" />;
+      default:
+        return <MdNotInterested className="mr-2 cursor-pointer" />; // Placeholder for "none"
+    }
   };
 
   return (
-    <li className="flex items-center text-xl py-2 relative group hover:bg-gold hover:text-gray-900">
-      {getPriorityIcon(todo.priority)}
-
+    <li className="flex items-center text-xl py-2 mx-4 relative group hover:scale-105 transition-transform duration-200">
+      {/* Clickable Priority Icon */}
+      <span onClick={cyclePriority} className="flex items-center">
+        {getPriorityIcon()}
+      </span>
       {isEditing ? (
         <Input
+          ref={inputRef}
           type="text"
           value={editText}
           onChange={e => setEditText(e.target.value)}
           onBlur={handleEditSave} // Save on blur
+          onKeyDown={handleKeyPress}
           className="flex-grow mr-2" // Input takes available space
         />
       ) : (
         <span
-          className={`flex-grow text-1xl${
-            todo.completed ? "line-through text-red-500" : ""
+          className={`flex-grow text-xl line-clamp-1 ${
+            todo.completed ? "text-fade" : ""
           }`}
         >
           {todo.text}

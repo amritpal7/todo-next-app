@@ -46,9 +46,9 @@ export const AllTodos: React.FC<TodoListProps> = ({
   onTodoPriority,
   onDeleteTodo,
 }) => (
-  <div className="w-1/2 pl-2">
+  <div className="w-3/5 pl-2">
     <h2 className="text-xl text-center font-bold mb-2">All Todos</h2>
-    <div className="max-h-[80vh] overflow-y-auto">
+    <div className="max-h-[90vh] overflow-y-auto">
       {" "}
       {/* Occupy half the width */}
       <ul>
